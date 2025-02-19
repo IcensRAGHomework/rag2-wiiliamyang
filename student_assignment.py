@@ -23,14 +23,12 @@ def hw02_2(q2_pdf):
     for page in document:
         full_text += page.page_content + "\n"
     
-    reg = r"(第\s*(\d+)\s*條)"
-    
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=60,
+        chunk_size=10,
         chunk_overlap=0,
         separators=[
-            # r"第\s*([一二三四五六七八九十\d]+)\s*章",
-            r"第\s*(\d+)\s*條"
+            r"第\s*.+?\s*章",
+            r"第\s*\d+\s*條"
         ],
         is_separator_regex=True
     )
