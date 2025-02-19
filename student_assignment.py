@@ -1,4 +1,3 @@
-import re
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import (CharacterTextSplitter,
                                       RecursiveCharacterTextSplitter)
@@ -22,27 +21,21 @@ def hw02_2(q2_pdf):
     
     full_text = ""
     for page in document:
-        full_text += page.page_content
-
-    chapter_pattern = re.compile(r'(第\s*[一二三四五六七八九十]+\s*章[\s\S]*?)(?=(第\s*[一二三四五六七八九十]+\s*章|$))')
-    article_pattern = re.compile(r'(第\s*\d+\s*條[\s\S]*?)(?=(第\s*\d+\s*條|$))')
-
-    chapters = chapter_pattern.findall(full_text)
-    chunks = []
+        full_text += page.page_content + "\n"
     
-    for chapter in chapters:
-        articles = article_pattern.findall(chapter[0])
-        chunks.extend(articles)
+    reg = r"(第\s*(\d+)\s*條)"
     
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=2000,
+        chunk_size=60,
         chunk_overlap=0,
-        separators=["\n\n", "\n", " ", ""]
+        separators=[
+            # r"第\s*([一二三四五六七八九十\d]+)\s*章",
+            r"第\s*(\d+)\s*條"
+        ],
+        is_separator_regex=True
     )
     
-    final_chunks = []
-    for chunk in chunks:
-        final_chunks.extend(text_splitter.split_text(chunk[0]))
+    final_chunks = text_splitter.split_text(full_text);
     
     return len(final_chunks)
 
@@ -59,3 +52,6 @@ def test(q2_pdf):
     chunks = splitter.split_documents(document)
     
     return len(chunks)
+
+num_chunks = hw02_2(q2_pdf)
+print(num_chunks)
